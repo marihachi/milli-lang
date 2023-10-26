@@ -1,4 +1,4 @@
-import type { Loc } from './syntaxes/syntax-node.js';
+import type { Loc } from './syntaxes/node.js';
 
 export function error(message: string, loc: Loc) {
 	return new Error(`${message} (${loc.line}:${loc.column})`);

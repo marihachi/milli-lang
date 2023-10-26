@@ -5,12 +5,6 @@ export type Loc = {
 	column: number;
 };
 
-export function applyChildren(parent: SyntaxNode, f: (x: SyntaxNode) => void) {
-	for (const child of parent.children) {
-		f(child);
-	}
-}
-
 export class Program {
 	kind = 'Program' as const;
 	children: Statement[] = [];

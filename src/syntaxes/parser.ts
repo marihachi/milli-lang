@@ -16,7 +16,7 @@ import {
 	Reference,
 	Statement,
 	Sub
-} from './syntax-node.js';
+} from './node.js';
 
 export function parse(input: string): Program {
 	const s = new Scanner(input);

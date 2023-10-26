@@ -1,16 +1,22 @@
 import { parse } from './syntaxes/parser.js';
-import { emit } from './emitter.js';
+import { emit } from './asm/emitter.js';
+import { AsmWriter } from './asm/writer.js';
+import { run } from './vm/runner.js';
 
 function start() {
-	const input = `
-		x = 1 + 2;
-		print x + 3;
+	const source = `
+		x = 1 + 3;
+		print x + 6;
 	`;
 
-	const nodes = parse(input);
+	// parse source
+	const tree = parse(source);
 
-	emit(nodes);
+	// emit asm
+	const asm = new AsmWriter();
+	emit(asm, tree);
 
-	// run();
+	// run asm
+	run(asm.code);
 }
 start();
