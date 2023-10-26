@@ -13,7 +13,7 @@ export function emit(w: AsmWriter, node: SyntaxNode) {
 function emitStatement(asm: AsmWriter, node: SyntaxNode) {
 	switch (node.kind) {
 		case 'PrintStatement': {
-			node.children.forEach(x => emitExpression(asm, x));
+			emitExpression(asm, node.children[0]);
 			asm.write(new Print());
 			return;
 		}
@@ -23,8 +23,8 @@ function emitStatement(asm: AsmWriter, node: SyntaxNode) {
 			if (a.kind !== 'Reference') {
 				throw new Error('reference expected');
 			}
-			asm.write(new PushIdent(a.identifier));
 			emitExpression(asm, b);
+			asm.write(new PushIdent(a.identifier));
 			asm.write(new Store());
 			return;
 		}
@@ -38,27 +38,31 @@ function emitStatement(asm: AsmWriter, node: SyntaxNode) {
 function emitExpression(asm: AsmWriter, node: SyntaxNode) {
 	switch (node.kind) {
 		case 'Add': {
-			node.children.forEach(x => emitExpression(asm, x));
+			emitExpression(asm, node.children[1]);
+			emitExpression(asm, node.children[0]);
 			asm.write(new Add());
 			return;
 		}
 		case 'Sub': {
-			node.children.forEach(x => emitExpression(asm, x));
+			emitExpression(asm, node.children[1]);
+			emitExpression(asm, node.children[0]);
 			asm.write(new Sub());
 			return;
 		}
 		case 'Mul': {
-			node.children.forEach(x => emitExpression(asm, x));
+			emitExpression(asm, node.children[1]);
+			emitExpression(asm, node.children[0]);
 			asm.write(new Mul());
 			return;
 		}
 		case 'Div': {
-			node.children.forEach(x => emitExpression(asm, x));
+			emitExpression(asm, node.children[1]);
+			emitExpression(asm, node.children[0]);
 			asm.write(new Div());
 			return;
 		}
 		case 'Minus': {
-			node.children.forEach(x => emitExpression(asm, x));
+			emitExpression(asm, node.children[0]);
 			asm.write(new Neg());
 			return;
 		}
