@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "name": "milli-lang",
+  "version": "1.0.0",
+  "description": "A toy language made with TypeScript.",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ."
+  },
+  "author": "marihachi",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.8"
+  }
+}
