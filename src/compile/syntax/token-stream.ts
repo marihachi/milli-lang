@@ -1,6 +1,6 @@
 import { error } from '../../util/error.js';
-import { TOKEN, TokenKind } from './token.js';
 import type { Token } from './token.js';
+import { TOKEN, TokenKind } from './token.js';
 
 /**
  * トークンの読み取りに関するインターフェース

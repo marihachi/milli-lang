@@ -3,11 +3,12 @@
   "name": "milli-lang",
   "version": "1.0.0",
   "description": "A toy language made with TypeScript.",
-  "main": "./dist/index.js",
+  "main": "./dist/start.js",
   "scripts": {
     "build": "tsc",
-    "start": "node ./dist/index.js",
-    "mat": "node ./dist/mat.js"
+    "start": "node ./dist/start.js",
+    "start-mat": "node ./dist/start-mat.js",
+    "disasm": "node ./dist/disasm.js"
   },
   "author": "marihachi",
   "license": "MIT",

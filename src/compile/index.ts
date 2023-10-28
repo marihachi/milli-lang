@@ -1,19 +1,19 @@
-import { AsmOperation } from '../asm/operation.js';
-import { AsmWriter } from '../asm/writer.js';
-import { emitAsm } from './ir/asm-emitter.js';
-import { emitIr } from './ir/emitter.js';
+import { VmOperation } from '../vm/operation.js';
+import { VmWriter } from '../vm/index.js';
+import { emitCode } from './ir/vm-emitter.js';
+import { emitIr } from './syntax/ir-emitter.js';
 import { parse } from './syntax/parser.js';
 
-export function compile(source: string): AsmOperation[] {
+export function compile(source: string): VmOperation[] {
 	// generate syntax tree
 	const syntax = parse(source);
 
 	// generate IR tree
 	const ir = emitIr(syntax);
 
-	// generate asm code
-	const asm = new AsmWriter();
-	emitAsm(asm, ir);
+	// generate vm code
+	const writer = new VmWriter();
+	emitCode(writer, ir);
 
-	return asm.code;
+	return writer.code;
 }

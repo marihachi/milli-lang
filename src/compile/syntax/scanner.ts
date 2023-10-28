@@ -1,8 +1,8 @@
 import { CharStream } from '../../util/char-stream.js';
-import { TOKEN, TokenKind } from './token.js';
+import { error } from '../../util/error.js';
 import type { ITokenStream } from './token-stream.js';
 import type { Token } from './token.js';
-import { error } from '../../util/error.js';
+import { TOKEN, TokenKind } from './token.js';
 
 const spaceChars = [' ', '\t'];
 const lineBreakChars = ['\r', '\n'];

@@ -5,18 +5,24 @@ We execute a code by compiling it for the VM.
 ## Usage
 Linux or Windows(WSL) supported.
 
+Run a milli code:
 ```
 $ npm i
 $ npm run build
-$ npm run start
+$ npm run mil
 ```
 Script file: `debug.mil`
 
-run from assembly code
+Run an assembly text:
 ```
 $ npm run mat
 ```
 Source file: `debug.mat`
+
+Compile a milli code to assembly text:
+```
+$ npm run mil2mat
+```
 
 ## License
 MIT

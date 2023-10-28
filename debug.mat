@@ -4,7 +4,7 @@ store
 
 pushIdent a
 load
-push 2
+push 3
 add
 
 print

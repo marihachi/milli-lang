@@ -8,15 +8,15 @@ import {
 	Div,
 	Expression,
 	ExpressionStatement,
-	Neg,
 	Mul,
+	Neg,
 	NumberLiteral,
 	PrintStatement,
 	Program,
 	Reference,
+	Rem,
 	Statement,
-	Sub,
-	Rem
+	Sub
 } from './node.js';
 
 export function parse(input: string): Program {

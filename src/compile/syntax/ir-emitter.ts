@@ -1,5 +1,5 @@
-import { SyntaxNode } from '../syntax/node.js';
-import { IrNode } from './node.js';
+import { SyntaxNode } from './node.js';
+import { IrNode } from '../ir/node.js';
 
 export function emitIr(node: SyntaxNode): IrNode {
 	return node;

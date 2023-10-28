@@ -1,16 +1,16 @@
 import { promises as fs } from 'fs';
-import { run } from './asm/runner.js';
-import { assemble } from './mat/index.js';
+import { runCode } from './vm/index.js';
+import { assemble } from './assemble/index.js';
 
 async function start() {
 	const filePath = './debug.mat';
 	const source = await fs.readFile(filePath, { encoding: 'utf-8' });
 
-	// assemble
-	const asm = assemble(source);
+	// asm text -> vm code
+	const code = assemble(source);
 
-	// run asm
-	run(asm);
+	// run the vm code
+	runCode(code);
 }
 
 start()

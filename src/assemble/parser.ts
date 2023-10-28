@@ -1,7 +1,7 @@
 import { error } from '../util/error.js';
+import { NumberLiteral, Operand, Operation, Program, Reference } from './node.js';
 import { Scanner } from './scanner.js';
 import { TokenKind } from './token.js';
-import { NumberLiteral, Operand, Operation, Program, Reference } from './node.js';
 
 export function parse(input: string): Program {
 	const s = new Scanner(input);

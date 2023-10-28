@@ -1,6 +1,14 @@
-import { AsmOperation, OpCode } from './operation.js';
+import { VmOperation, OpCode } from './operation.js';
 
-export function run(code: AsmOperation[]) {
+export class VmWriter {
+	code: VmOperation[] = [];
+
+	write(node: VmOperation) {
+		this.code.push(node);
+	}
+}
+
+export function runCode(code: VmOperation[]) {
 	const memory: Map<string, { value: number }> = new Map();
 	const stack: (string | number)[] = [];
 	for (const op of code) {

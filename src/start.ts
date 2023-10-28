@@ -1,16 +1,16 @@
 import { promises as fs } from 'fs';
-import { run } from './asm/runner.js';
+import { runCode } from './vm/index.js';
 import { compile } from './compile/index.js';
 
 async function start() {
 	const filePath = './debug.mil';
 	const source = await fs.readFile(filePath, { encoding: 'utf-8' });
 
-	// compile
-	const asm = compile(source);
+	// milli code -> vm code
+	const code = compile(source);
 
-	// run asm
-	run(asm);
+	// run the vm code
+	runCode(code);
 }
 
 start()
