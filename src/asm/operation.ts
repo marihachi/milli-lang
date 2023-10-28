@@ -29,6 +29,6 @@ export enum OpCode {
 export class AsmOperation {
 	constructor(
 		public opcode: OpCode,
-		public operands?: (string | number)[],
+		public operands: (string | number)[] = [],
 	) { }
 }

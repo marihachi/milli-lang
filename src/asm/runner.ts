@@ -1,22 +1,28 @@
-import { AsmOperation } from './operation.js';
+import { AsmOperation, OpCode } from './operation.js';
 
 export function run(code: AsmOperation[]) {
 	const memory: Map<string, { value: number }> = new Map();
 	const stack: (string | number)[] = [];
 	for (const op of code) {
-		switch (op.kind) {
-			case 'Nop': {
+		switch (op.opcode) {
+			case OpCode.Nop: {
 				break;
 			}
-			case 'Push': {
-				stack.push(op.value);
+			case OpCode.Push: {
+				if (op.operands.length == 0) {
+					throw new Error('runtime error. (op: Push)');
+				}
+				stack.push(op.operands[0]);
 				break;
 			}
-			case 'PushIdent': {
-				stack.push(op.identifier);
+			case OpCode.PushIdent: {
+				if (op.operands.length == 0) {
+					throw new Error('runtime error. (op: PushIdent)');
+				}
+				stack.push(op.operands[0]);
 				break;
 			}
-			case 'Add': {
+			case OpCode.Add: {
 				const a = stack.pop();
 				const b = stack.pop();
 				if (typeof a !== 'number' || typeof b !== 'number') {
@@ -26,7 +32,7 @@ export function run(code: AsmOperation[]) {
 				stack.push(x);
 				break;
 			}
-			case 'Sub': {
+			case OpCode.Sub: {
 				const a = stack.pop();
 				const b = stack.pop();
 				if (typeof a !== 'number' || typeof b !== 'number') {
@@ -36,7 +42,7 @@ export function run(code: AsmOperation[]) {
 				stack.push(x);
 				break;
 			}
-			case 'Mul': {
+			case OpCode.Mul: {
 				const a = stack.pop();
 				const b = stack.pop();
 				if (typeof a !== 'number' || typeof b !== 'number') {
@@ -46,7 +52,7 @@ export function run(code: AsmOperation[]) {
 				stack.push(x);
 				break;
 			}
-			case 'Div': {
+			case OpCode.Div: {
 				const a = stack.pop();
 				const b = stack.pop();
 				if (typeof a !== 'number' || typeof b !== 'number') {
@@ -56,7 +62,7 @@ export function run(code: AsmOperation[]) {
 				stack.push(x);
 				break;
 			}
-			case 'Rem': {
+			case OpCode.Rem: {
 				const a = stack.pop();
 				const b = stack.pop();
 				if (typeof a !== 'number' || typeof b !== 'number') {
@@ -66,7 +72,7 @@ export function run(code: AsmOperation[]) {
 				stack.push(x);
 				break;
 			}
-			case 'Neg': {
+			case OpCode.Neg: {
 				const a = stack.pop();
 				if (typeof a !== 'number') {
 					throw new Error('runtime error. (op: Neg)');
@@ -75,7 +81,7 @@ export function run(code: AsmOperation[]) {
 				stack.push(x);
 				break;
 			}
-			case 'Store': {
+			case OpCode.Store: {
 				const a = stack.pop();
 				if (typeof a !== 'string') {
 					throw new Error('runtime error. (op: Store)');
@@ -87,7 +93,7 @@ export function run(code: AsmOperation[]) {
 				memory.set(a, { value: b });
 				break;
 			}
-			case 'Load': {
+			case OpCode.Load: {
 				const a = stack.pop();
 				if (typeof a !== 'string') {
 					throw new Error('runtime error. (op: Load)');
@@ -99,7 +105,7 @@ export function run(code: AsmOperation[]) {
 				stack.push(x.value);
 				break;
 			}
-			case 'Print': {
+			case OpCode.Print: {
 				const a = stack.pop();
 				if (typeof a !== 'number') {
 					throw new Error('runtime error. (op: Print)');
