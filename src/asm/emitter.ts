@@ -1,5 +1,5 @@
 import { IrNode } from '../ir/node.js';
-import { Add, Div, Load, Mul, Neg, Print, Push, PushIdent, Store, Sub } from './node.js';
+import { Add, Div, Load, Mul, Neg, Print, Push, PushIdent, Rem, Store, Sub } from './node.js';
 import { AsmWriter } from './writer.js';
 
 export function emit(w: AsmWriter, node: IrNode) {
@@ -65,7 +65,13 @@ function emitExpression(asm: AsmWriter, node: IrNode) {
 			asm.write(new Div());
 			return;
 		}
-		case 'Minus': {
+		case 'Rem': {
+			emitExpression(asm, node.children[1]);
+			emitExpression(asm, node.children[0]);
+			asm.write(new Rem());
+			return;
+		}
+		case 'Neg': {
 			emitExpression(asm, node.children[0]);
 			asm.write(new Neg());
 			return;

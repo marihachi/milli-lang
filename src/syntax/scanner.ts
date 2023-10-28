@@ -111,6 +111,11 @@ export class Scanner implements ITokenStream {
 				return token;
 			}
 			switch (this.stream.char) {
+				case '%': {
+					this.stream.next();
+					token = TOKEN(TokenKind.Percent, loc, { });
+					break;
+				}
 				case '(': {
 					this.stream.next();
 					token = TOKEN(TokenKind.OpenParen, loc, { });

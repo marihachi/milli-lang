@@ -8,14 +8,15 @@ import {
 	Div,
 	Expression,
 	ExpressionStatement,
-	Minus,
+	Neg,
 	Mul,
 	NumberLiteral,
 	PrintStatement,
 	Program,
 	Reference,
 	Statement,
-	Sub
+	Sub,
+	Rem
 } from './node.js';
 
 export function parse(input: string): Program {
@@ -74,6 +75,7 @@ const operators: OpInfo[] = [
 
 	{ opKind: 'infix', kind: TokenKind.Asterisk, lbp: 4, rbp: 5 },
 	{ opKind: 'infix', kind: TokenKind.Slash, lbp: 4, rbp: 5 },
+	{ opKind: 'infix', kind: TokenKind.Percent, lbp: 4, rbp: 5 },
 
 	{ opKind: 'infix', kind: TokenKind.Plus, lbp: 2, rbp: 3 },
 	{ opKind: 'infix', kind: TokenKind.Minus, lbp: 2, rbp: 3 },
@@ -91,7 +93,7 @@ function parsePrefix(s: ITokenStream, minBp: number): Expression {
 			return expr;
 		}
 		case TokenKind.Minus: {
-			return new Minus(expr, loc);
+			return new Neg(expr, loc);
 		}
 		default: {
 			throw error('unexpected token', loc);
@@ -118,6 +120,9 @@ function parseInfix(s: ITokenStream, left: Expression, minBp: number): Expressio
 		}
 		case TokenKind.Slash: {
 			return new Div(left, right, loc);
+		}
+		case TokenKind.Percent: {
+			return new Rem(left, right, loc);
 		}
 		default: {
 			throw error('unexpected token', loc);

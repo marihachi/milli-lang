@@ -5,6 +5,9 @@ export function run(code: AsmNode[]) {
 	const stack: (string | number)[] = [];
 	for (const op of code) {
 		switch (op.kind) {
+			case 'Nop': {
+				break;
+			}
 			case 'Push': {
 				stack.push(op.value);
 				break;
@@ -50,6 +53,16 @@ export function run(code: AsmNode[]) {
 					throw new Error('runtime error. (op: Div)');
 				}
 				const x = a / b;
+				stack.push(x);
+				break;
+			}
+			case 'Rem': {
+				const a = stack.pop();
+				const b = stack.pop();
+				if (typeof a !== 'number' || typeof b !== 'number') {
+					throw new Error('runtime error. (op: Rem)');
+				}
+				const x = a % b;
 				stack.push(x);
 				break;
 			}

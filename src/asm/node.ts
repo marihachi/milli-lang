@@ -1,4 +1,8 @@
-export type AsmNode = PushIdent | Push | Add | Sub | Mul | Div | Neg | Store | Load | Print;
+export type AsmNode = Nop | PushIdent | Push | Add | Sub | Mul | Div | Rem | Neg | Store | Load | Print;
+
+export class Nop {
+	kind = 'Nop' as const;
+}
 
 export class PushIdent {
 	kind = 'PushIdent' as const;
@@ -28,6 +32,10 @@ export class Mul {
 
 export class Div {
 	kind = 'Div' as const;
+}
+
+export class Rem {
+	kind = 'Rem' as const;
 }
 
 // 符号反転

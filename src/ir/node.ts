@@ -50,7 +50,7 @@ export class ExpressionStatement {
 	}
 }
 
-export type Expression = NumberLiteral | Reference | Add | Sub | Mul | Div | Minus;
+export type Expression = NumberLiteral | Reference | Add | Sub | Mul | Div | Rem | Neg;
 
 export class NumberLiteral {
 	kind = 'NumberLiteral' as const;
@@ -122,8 +122,21 @@ export class Div {
 	}
 }
 
-export class Minus {
-	kind = 'Minus' as const;
+export class Rem {
+	kind = 'Rem' as const;
+	children: Expression[] = [];
+	constructor(
+		left: Expression,
+		right: Expression,
+		public loc: Loc,
+	) {
+		this.children.push(left);
+		this.children.push(right);
+	}
+}
+
+export class Neg {
+	kind = 'Neg' as const;
 	children: Expression[] = [];
 	constructor(
 		expr: Expression,

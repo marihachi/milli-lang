@@ -9,6 +9,8 @@ export enum TokenKind {
 	// keyword
 	PrintKeyword,
 
+	/** "%" */
+	Percent,
 	/** "(" */
 	OpenParen,
 	/** ")" */
