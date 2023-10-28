@@ -1,9 +1,9 @@
-import { AsmNode } from './node.js';
+import { AsmOperation } from './operation.js';
 
 export class AsmWriter {
-	code: AsmNode[] = [];
+	code: AsmOperation[] = [];
 
-	write(node: AsmNode) {
+	write(node: AsmOperation) {
 		this.code.push(node);
 	}
 }

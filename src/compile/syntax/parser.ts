@@ -1,4 +1,4 @@
-import { error } from '../util.js';
+import { error } from '../../util/error.js';
 import { Scanner } from './scanner.js';
 import { ITokenStream } from './token-stream.js';
 import { TokenKind } from './token.js';

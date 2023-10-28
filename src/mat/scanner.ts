@@ -1,9 +1,7 @@
-import { CharStream } from './char-stream.js';
+import { CharStream } from '../util/char-stream.js';
 import { TOKEN, TokenKind } from './token.js';
-
-import type { ITokenStream } from './token-stream.js';
 import type { Token } from './token.js';
-import { error } from '../util.js';
+import { error } from '../util/error.js';
 
 const spaceChars = [' ', '\t'];
 const lineBreakChars = ['\r', '\n'];
@@ -13,7 +11,7 @@ const wordChar = /^[A-Za-z0-9_]$/;
 /**
  * 入力文字列からトークンを読み取るクラス
 */
-export class Scanner implements ITokenStream {
+export class Scanner {
 	private stream: CharStream;
 	private _tokens: Token[] = [];
 
@@ -111,34 +109,19 @@ export class Scanner implements ITokenStream {
 				return token;
 			}
 			switch (this.stream.char) {
-				case '%': {
+				case ',': {
 					this.stream.next();
-					token = TOKEN(TokenKind.Percent, loc, { });
+					token = TOKEN(TokenKind.Comma, loc, { });
 					break;
 				}
-				case '(': {
+				case '.': {
 					this.stream.next();
-					token = TOKEN(TokenKind.OpenParen, loc, { });
+					token = TOKEN(TokenKind.Dot, loc, { });
 					break;
 				}
-				case ')': {
+				case ':': {
 					this.stream.next();
-					token = TOKEN(TokenKind.CloseParen, loc, { });
-					break;
-				}
-				case '*': {
-					this.stream.next();
-					token = TOKEN(TokenKind.Asterisk, loc, { });
-					break;
-				}
-				case '+': {
-					this.stream.next();
-					token = TOKEN(TokenKind.Plus, loc, { });
-					break;
-				}
-				case '-': {
-					this.stream.next();
-					token = TOKEN(TokenKind.Minus, loc, { });
+					token = TOKEN(TokenKind.Colon, loc, { });
 					break;
 				}
 				case '/': {
@@ -151,19 +134,7 @@ export class Scanner implements ITokenStream {
 						this.stream.next();
 						this.skipCommentLine();
 						continue;
-					} else {
-						token = TOKEN(TokenKind.Slash, loc, { });
 					}
-					break;
-				}
-				case ';': {
-					this.stream.next();
-					token = TOKEN(TokenKind.SemiColon, loc, { });
-					break;
-				}
-				case '=': {
-					this.stream.next();
-					token = TOKEN(TokenKind.Eq, loc, { });
 					break;
 				}
 			}
@@ -198,15 +169,7 @@ export class Scanner implements ITokenStream {
 		if (value.length === 0) {
 			return;
 		}
-		// check word kind
-		switch (value) {
-			case 'print': {
-				return TOKEN(TokenKind.PrintKeyword, loc, { });
-			}
-			default: {
-				return TOKEN(TokenKind.Identifier, loc, { value });
-			}
-		}
+		return TOKEN(TokenKind.Identifier, loc, { value });
 	}
 
 	private tryReadDigits(): Token | undefined {
@@ -238,7 +201,7 @@ export class Scanner implements ITokenStream {
 		} else {
 			value = wholeNumber;
 		}
-		return TOKEN(TokenKind.NumberLiteral, loc, { value });
+		return TOKEN(TokenKind.Number, loc, { value });
 	}
 
 	private skipCommentLine(): void {

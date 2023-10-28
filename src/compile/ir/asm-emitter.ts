@@ -1,8 +1,8 @@
-import { IrNode } from '../ir/node.js';
-import { Add, Div, Load, Mul, Neg, Print, Push, PushIdent, Rem, Store, Sub } from './node.js';
-import { AsmWriter } from './writer.js';
+import { IrNode } from './node.js';
+import { AsmWriter } from '../../asm/writer.js';
+import { AsmOperation, OpCode } from '../../asm/operation.js';
 
-export function emit(w: AsmWriter, node: IrNode) {
+export function emitAsm(w: AsmWriter, node: IrNode) {
 	emitProgram(w, node);
 }
 
@@ -18,7 +18,7 @@ function emitStatement(asm: AsmWriter, node: IrNode) {
 	switch (node.kind) {
 		case 'PrintStatement': {
 			emitExpression(asm, node.children[0]);
-			asm.write(new Print());
+			asm.write(new AsmOperation(OpCode.Print));
 			return;
 		}
 		case 'AssignStatement': {
@@ -28,8 +28,8 @@ function emitStatement(asm: AsmWriter, node: IrNode) {
 				throw new Error('reference expected');
 			}
 			emitExpression(asm, b);
-			asm.write(new PushIdent(a.identifier));
-			asm.write(new Store());
+			asm.write(new AsmOperation(OpCode.PushIdent, [a.identifier]));
+			asm.write(new AsmOperation(OpCode.Store));
 			return;
 		}
 		case 'ExpressionStatement': {
@@ -44,45 +44,45 @@ function emitExpression(asm: AsmWriter, node: IrNode) {
 		case 'Add': {
 			emitExpression(asm, node.children[1]);
 			emitExpression(asm, node.children[0]);
-			asm.write(new Add());
+			asm.write(new AsmOperation(OpCode.Add));
 			return;
 		}
 		case 'Sub': {
 			emitExpression(asm, node.children[1]);
 			emitExpression(asm, node.children[0]);
-			asm.write(new Sub());
+			asm.write(new AsmOperation(OpCode.Sub));
 			return;
 		}
 		case 'Mul': {
 			emitExpression(asm, node.children[1]);
 			emitExpression(asm, node.children[0]);
-			asm.write(new Mul());
+			asm.write(new AsmOperation(OpCode.Mul));
 			return;
 		}
 		case 'Div': {
 			emitExpression(asm, node.children[1]);
 			emitExpression(asm, node.children[0]);
-			asm.write(new Div());
+			asm.write(new AsmOperation(OpCode.Div));
 			return;
 		}
 		case 'Rem': {
 			emitExpression(asm, node.children[1]);
 			emitExpression(asm, node.children[0]);
-			asm.write(new Rem());
+			asm.write(new AsmOperation(OpCode.Rem));
 			return;
 		}
 		case 'Neg': {
 			emitExpression(asm, node.children[0]);
-			asm.write(new Neg());
+			asm.write(new AsmOperation(OpCode.Neg));
 			return;
 		}
 		case 'NumberLiteral': {
-			asm.write(new Push(node.value));
+			asm.write(new AsmOperation(OpCode.Push, [node.value]));
 			return;
 		}
 		case 'Reference': {
-			asm.write(new PushIdent(node.identifier));
-			asm.write(new Load());
+			asm.write(new AsmOperation(OpCode.PushIdent, [node.identifier]));
+			asm.write(new AsmOperation(OpCode.Load));
 			return;
 		}
 	}

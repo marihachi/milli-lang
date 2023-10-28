@@ -1,4 +1,4 @@
-import { error } from '../util.js';
+import { error } from '../../util/error.js';
 import { TOKEN, TokenKind } from './token.js';
 import type { Token } from './token.js';
 

@@ -1,6 +1,6 @@
-import { AsmNode } from '../asm/node.js';
+import { AsmOperation } from './operation.js';
 
-export function run(code: AsmNode[]) {
+export function run(code: AsmOperation[]) {
 	const memory: Map<string, { value: number }> = new Map();
 	const stack: (string | number)[] = [];
 	for (const op of code) {
