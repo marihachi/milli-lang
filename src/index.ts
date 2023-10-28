@@ -1,13 +1,12 @@
+import { promises as fs } from 'fs';
 import { parse } from './syntaxes/parser.js';
 import { emit } from './asm/emitter.js';
 import { AsmWriter } from './asm/writer.js';
 import { run } from './vm/runner.js';
 
-function start() {
-	const source = `
-		x = 1 + 3;
-		print x + 6;
-	`;
+async function start() {
+	const filePath = './debug.mil';
+	const source = await fs.readFile(filePath, { encoding: 'utf-8' });
 
 	// parse source
 	const tree = parse(source);
@@ -19,4 +18,8 @@ function start() {
 	// run asm
 	run(asm.code);
 }
-start();
+
+start()
+.catch(err => {
+	console.log(err);
+});
