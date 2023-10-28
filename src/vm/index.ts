@@ -1,33 +1,30 @@
-import { VmOperation, OpCode } from './operation.js';
+import { Buffer } from 'buffer';
+import { OpCode, InstructionReader } from './instruction.js';
 
-export class VmWriter {
-	code: VmOperation[] = [];
+// 32bit instruction
 
-	write(node: VmOperation) {
-		this.code.push(node);
-	}
-}
-
-export function runCode(code: VmOperation[]) {
+export function runCode(buf: Buffer) {
 	const memory: Map<string, { value: number }> = new Map();
 	const stack: (string | number)[] = [];
-	for (const op of code) {
-		switch (op.opcode) {
+	let pc = 0;
+	const reader = new InstructionReader(buf);
+	while (true) {
+		const inst = reader.read(pc);
+		if (inst == null) {
+			break;
+		}
+		pc++;
+
+		switch (inst.opCode) {
 			case OpCode.Nop: {
 				break;
 			}
 			case OpCode.Push: {
-				if (op.operands.length == 0) {
-					throw new Error('runtime error. (op: Push)');
-				}
-				stack.push(op.operands[0]);
+				stack.push(inst.operands[0]);
 				break;
 			}
 			case OpCode.PushIdent: {
-				if (op.operands.length == 0) {
-					throw new Error('runtime error. (op: PushIdent)');
-				}
-				stack.push(op.operands[0]);
+				stack.push(inst.operands[0]);
 				break;
 			}
 			case OpCode.Add: {

@@ -1,4 +1,4 @@
-export type MatNode = Program | Operation | Operand;
+export type MatNode = Program | Statement | Operand;
 
 export type Loc = {
 	line: number;
@@ -9,15 +9,15 @@ export class Program {
 	kind = 'Program' as const;
 	children: MatNode[] = [];
 	constructor(
-		statements: Operation[],
+		statements: Statement[],
 		public loc: Loc,
 	) {
 		this.children.push(...statements);
 	}
 }
 
-export class Operation {
-	kind = 'Operation' as const;
+export class Statement {
+	kind = 'Statement' as const;
 	children: MatNode[] = [];
 	constructor(
 		public opcode: string,

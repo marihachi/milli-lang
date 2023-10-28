@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { compile } from './compile/index.js';
-import { OpCode, VmOperation } from './vm/operation.js';
+import { InstructionReader, opTable } from './vm/instruction.js';
 
 async function start() {
 	const input = './debug.mil';
@@ -17,37 +17,31 @@ async function start() {
 	await fs.writeFile(output, mat, { encoding: 'utf-8' });
 }
 
-const opCodeTable = new Map<OpCode, string>([
-	[OpCode.Nop, 'Nop'],
-	[OpCode.PushIdent, 'pushIdent'],
-	[OpCode.Push, 'Push'],
-	[OpCode.Add, 'Add'],
-	[OpCode.Sub, 'Sub'],
-	[OpCode.Mul, 'Mul'],
-	[OpCode.Div, 'Div'],
-	[OpCode.Rem, 'Rem'],
-	[OpCode.Neg, 'Neg'],
-	[OpCode.Store, 'Store'],
-	[OpCode.Load, 'Load'],
-	[OpCode.Print, 'Print'],
-]);
-
-function disasm(operations: VmOperation[]): string {
+function disasm(instructions: Buffer): string {
 	let mat = '';
-	for (const operation of operations) {
-		const opcode = opCodeTable.get(operation.opcode);
-		if (opcode == null) {
-			throw new Error('unknown operation');
+	const reader = new InstructionReader(instructions);
+	let offset = 0;
+	while (true) {
+		const inst = reader.read(offset);
+		if (inst == null) {
+			break;
 		}
-		const operands = operation.operands
-			.map(x => x.toString())
-			.join(', ');
-		if (operands.length > 0) {
-			mat += opcode + ' ' + operands + '\n';
-		} else {
-			mat += opcode + '\n';
+		const op = opTable.find(x => x.code === inst.opCode);
+		if (op == null) {
+			throw new Error('unknown instruction');
 		}
+		let operandsPart = '';
+		for (let i = 0; i < op.operands; i++) {
+			if (operandsPart.length == 0) {
+				operandsPart += ' ';
+			} else {
+				operandsPart += ', ';
+			}
+			operandsPart += inst.operands[i].toString();
+		}
+		mat += op.name + operandsPart + '\n';
 	}
+
 	return mat;
 }
 

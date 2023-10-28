@@ -1,5 +1,5 @@
 import { error } from '../util/error.js';
-import { NumberLiteral, Operand, Operation, Program, Reference } from './node.js';
+import { NumberLiteral, Operand, Statement, Program, Reference } from './node.js';
 import { Scanner } from './scanner.js';
 import { TokenKind } from './token.js';
 
@@ -11,12 +11,12 @@ export function parse(input: string): Program {
 
 function parseProgram(s: Scanner): Program {
 	const loc = s.token.loc;
-	const nodes: Operation[] = [];
+	const nodes: Statement[] = [];
 	while (s.getKind() !== TokenKind.EOF) {
 		if (s.getKind() === TokenKind.NewLine) {
 			s.next();
 		} else {
-			const n = parseOperation(s);
+			const n = parseStatement(s);
 			nodes.push(n);
 			s.nextWith(TokenKind.NewLine);
 		}
@@ -24,7 +24,7 @@ function parseProgram(s: Scanner): Program {
 	return new Program(nodes, loc);
 }
 
-function parseOperation(s: Scanner): Operation {
+function parseStatement(s: Scanner): Statement {
 	const loc = s.token.loc;
 	s.expect(TokenKind.Identifier);
 	const opcode = s.token.value!;
@@ -39,7 +39,7 @@ function parseOperation(s: Scanner): Operation {
 		operands.push(operand);
 	}
 
-	return new Operation(opcode, operands, loc);
+	return new Statement(opcode, operands, loc);
 }
 
 function parseOperand(s: Scanner): Operand {

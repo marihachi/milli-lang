@@ -1,43 +1,28 @@
-import { VmOperation, OpCode } from '../vm/operation.js';
+import { InstructionWriter, Instruction, opTable } from '../vm/instruction.js';
 import { parse } from './parser.js';
 import { Program } from './node.js';
 
-const opCodeTable = new Map<string, OpCode>([
-	['nop', OpCode.Nop],
-	['pushident', OpCode.PushIdent],
-	['push', OpCode.Push],
-	['add', OpCode.Add],
-	['sub', OpCode.Sub],
-	['mul', OpCode.Mul],
-	['div', OpCode.Div],
-	['rem', OpCode.Rem],
-	['neg', OpCode.Neg],
-	['store', OpCode.Store],
-	['load', OpCode.Load],
-	['print', OpCode.Print],
-]);
-
-export function assemble(mat: string): VmOperation[] {
+export function assemble(mat: string): Buffer {
 	// parse text asm
 	const tree = parse(mat);
 
 	// generate vm code
-	const code = emitCode(tree);
+	const w = new InstructionWriter;
+	emitCode(w, tree);
+	const code = w.serialize();
 
 	return code;
 }
 
-function emitCode(program: Program): VmOperation[] {
-	const asm: VmOperation[] = [];
-
+function emitCode(w: InstructionWriter, program: Program) {
 	for (const node of program.children) {
-		if (node.kind !== 'Operation') {
-			throw new Error('operation expected');
+		if (node.kind !== 'Statement') {
+			throw new Error('statement expected');
 		}
 
-		const opCode = opCodeTable.get(node.opcode.toLowerCase());
-		if (opCode == null) {
-			throw new Error('unknown operation');
+		const op = opTable.find(x => x.name.toLowerCase() === node.opcode.toLowerCase());
+		if (op == null) {
+			throw new Error('unknown instruction');
 		}
 
 		const operands: (string | number)[] = [];
@@ -57,8 +42,6 @@ function emitCode(program: Program): VmOperation[] {
 			}
 		}
 
-		asm.push(new VmOperation(opCode, operands));
+		w.write(new Instruction(op.code, operands));
 	}
-
-	return asm;
 }
