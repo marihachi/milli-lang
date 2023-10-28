@@ -1,5 +1,5 @@
 # milli-lang
-A toy language made with TypeScript.
+A toy language made with TypeScript.  
 We execute a code by compiling it for the VM.
 
 ## Usage
