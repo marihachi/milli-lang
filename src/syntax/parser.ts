@@ -20,12 +20,12 @@ import {
 
 export function parse(input: string): Program {
 	const s = new Scanner(input);
-	const loc = s.token.loc;
-	const statements = parseStatements(s);
-	return new Program(statements, loc);
+	const node = parseProgram(s);
+	return node;
 }
 
-function parseStatements(s: ITokenStream): Statement[] {
+function parseProgram(s: ITokenStream): Program {
+	const loc = s.token.loc;
 	const nodes: Statement[] = [];
 	while (s.getKind() !== TokenKind.EOF) {
 		if (s.getKind() === TokenKind.SemiColon || s.getKind() === TokenKind.NewLine) {
@@ -36,7 +36,7 @@ function parseStatements(s: ITokenStream): Statement[] {
 			s.nextWith(TokenKind.SemiColon);
 		}
 	}
-	return nodes;
+	return new Program(nodes, loc);
 }
 
 function parseStatement(s: ITokenStream): Statement {

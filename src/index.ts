@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs';
-import { parse } from './syntaxes/parser.js';
+import { parse } from './syntax/parser.js';
 import { emit } from './asm/emitter.js';
 import { AsmWriter } from './asm/writer.js';
 import { run } from './vm/runner.js';
