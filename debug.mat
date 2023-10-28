@@ -1,0 +1,10 @@
+push 1
+pushIdent a
+store
+
+pushIdent a
+load
+push 2
+add
+
+print

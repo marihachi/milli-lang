@@ -6,7 +6,8 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node ."
+    "start": "node ./dist/index.js",
+    "mat": "node ./dist/mat.js"
   },
   "author": "marihachi",
   "license": "MIT",

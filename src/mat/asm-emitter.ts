@@ -3,7 +3,7 @@ import { MatNode, Program } from './node.js';
 
 const opCodeTable = new Map<string, OpCode>([
 	['nop', OpCode.Nop],
-	['pushIdent', OpCode.PushIdent],
+	['pushident', OpCode.PushIdent],
 	['push', OpCode.Push],
 	['add', OpCode.Add],
 	['sub', OpCode.Sub],

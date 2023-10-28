@@ -31,7 +31,7 @@ function parseOperation(s: Scanner): Operation {
 	s.next();
 
 	const operands: Operand[] = [];
-	while (s.getKind() !== TokenKind.EOF) {
+	while (s.getKind() !== TokenKind.EOF && s.getKind() !== TokenKind.NewLine) {
 		if (operands.length > 0) {
 			s.nextWith(TokenKind.Comma);
 		}

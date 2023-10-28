@@ -12,5 +12,11 @@ $ npm run start
 ```
 Script file: `debug.mil`
 
+run from assembly code
+```
+$ npm run mat
+```
+Source file: `debug.mat`
+
 ## License
 MIT

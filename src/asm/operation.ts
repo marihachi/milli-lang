@@ -1,5 +1,5 @@
 export enum OpCode {
-	Nop = 0,
+	Nop = 0x00,
 	PushIdent,
 	Push,
 
