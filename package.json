@@ -9,7 +9,8 @@
     "compile": "node ./dist/compile.js",
     "start": "node ./dist/start.js",
     "asm": "node ./dist/asm.js",
-    "disasm": "node ./dist/disasm.js"
+    "disasm": "node ./dist/disasm.js",
+    "dump": "node ./dist/dump.js"
   },
   "author": "marihachi",
   "license": "MIT",
