@@ -3,17 +3,29 @@ import { OpCode, InstructionReader } from './instruction.js';
 
 // 32bit instruction
 
-export function runCode(buf: Buffer) {
-	const memory: Map<string, { value: number }> = new Map();
-	const stack: (string | number)[] = [];
+export function runCode(buf: Buffer, debug: boolean) {
+	const memory: number[] = [];
+	const stack: number[] = [];
 	let pc = 0;
 	const reader = new InstructionReader(buf);
 	while (true) {
 		const inst = reader.read(pc);
 		if (inst == null) {
+			if (debug) {
+				console.log('stop');
+			}
 			break;
 		}
-		pc++;
+
+		if (debug) {
+			console.log('pc:', pc);
+			console.log('inst:', inst.opCode + ', ' + inst.operands.join(', '));
+			console.log('stack:', stack);
+			console.log('memory:', memory);
+			console.log('----');
+		}
+
+		pc += 4;
 
 		switch (inst.opCode) {
 			case OpCode.Nop: {
@@ -23,7 +35,7 @@ export function runCode(buf: Buffer) {
 				stack.push(inst.operands[0]);
 				break;
 			}
-			case OpCode.PushIdent: {
+			case OpCode.PushLocal: {
 				stack.push(inst.operands[0]);
 				break;
 			}
@@ -88,26 +100,26 @@ export function runCode(buf: Buffer) {
 			}
 			case OpCode.Store: {
 				const a = stack.pop();
-				if (typeof a !== 'string') {
+				if (typeof a !== 'number') {
 					throw new Error('runtime error. (op: Store)');
 				}
 				const b = stack.pop();
 				if (typeof b !== 'number') {
 					throw new Error('runtime error. (op: Store)');
 				}
-				memory.set(a, { value: b });
+				memory[a] = b;
 				break;
 			}
 			case OpCode.Load: {
 				const a = stack.pop();
-				if (typeof a !== 'string') {
+				if (typeof a !== 'number') {
 					throw new Error('runtime error. (op: Load)');
 				}
-				const x = memory.get(a);
-				if (x == null) {
+				const x = memory[a];
+				if (typeof x !== 'number') {
 					throw new Error('runtime error. (op: Load)');
 				}
-				stack.push(x.value);
+				stack.push(x);
 				break;
 			}
 			case OpCode.Print: {

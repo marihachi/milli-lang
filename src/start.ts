@@ -7,10 +7,10 @@ async function start() {
 	const source = await fs.readFile(filePath, { encoding: 'utf-8' });
 
 	// milli code -> vm code
-	const code = compile(source);
+	const code = compile(source, false);
 
 	// run the vm code
-	runCode(code);
+	runCode(code, false);
 }
 
 start()

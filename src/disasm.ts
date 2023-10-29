@@ -7,7 +7,7 @@ async function start() {
 	const source = await fs.readFile(input, { encoding: 'utf-8' });
 
 	// milli code -> vm code
-	const asm = compile(source);
+	const asm = compile(source, false);
 
 	// vm code -> asm text
 	const mat = disasm(asm);
@@ -20,9 +20,10 @@ async function start() {
 function disasm(instructions: Buffer): string {
 	let mat = '';
 	const reader = new InstructionReader(instructions);
-	let offset = 0;
+	let address = 0;
 	while (true) {
-		const inst = reader.read(offset);
+		const inst = reader.read(address);
+		address += 4;
 		if (inst == null) {
 			break;
 		}
