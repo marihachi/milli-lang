@@ -12,8 +12,8 @@ $ npm run build
 
 ## Usage
 
-source file: `*.mil`
-bytecode file: `*.mbc`
+source file: `*.mil`  
+bytecode file: `*.mbc`  
 assembly file: `*.asm`
 
 Compile a milli-lang source(.mil) to a bytecode file(.mbc):
