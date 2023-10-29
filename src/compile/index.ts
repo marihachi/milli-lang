@@ -1,10 +1,10 @@
-import { VmOperation } from '../vm/operation.js';
-import { VmWriter } from '../vm/index.js';
+import { InstructionWriter } from '../vm/instruction.js';
+import { Env } from './ir/index.js';
 import { emitCode } from './ir/vm-emitter.js';
 import { emitIr } from './syntax/ir-emitter.js';
 import { parse } from './syntax/parser.js';
 
-export function compile(source: string): VmOperation[] {
+export function compile(source: string, debug: boolean): Buffer {
 	// generate syntax tree
 	const syntax = parse(source);
 
@@ -12,8 +12,10 @@ export function compile(source: string): VmOperation[] {
 	const ir = emitIr(syntax);
 
 	// generate vm code
-	const writer = new VmWriter();
-	emitCode(writer, ir);
+	const writer = new InstructionWriter();
+	const env = new Env();
+	emitCode(writer, env, ir);
+	const code = writer.serialize();
 
-	return writer.code;
+	return code;
 }

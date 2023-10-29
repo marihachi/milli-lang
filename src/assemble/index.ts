@@ -1,46 +1,57 @@
-import { VmOperation, OpCode } from '../vm/operation.js';
+import { InstructionWriter, Instruction, opTable } from '../vm/instruction.js';
 import { parse } from './parser.js';
 import { Program } from './node.js';
 
-const opCodeTable = new Map<string, OpCode>([
-	['nop', OpCode.Nop],
-	['pushident', OpCode.PushIdent],
-	['push', OpCode.Push],
-	['add', OpCode.Add],
-	['sub', OpCode.Sub],
-	['mul', OpCode.Mul],
-	['div', OpCode.Div],
-	['rem', OpCode.Rem],
-	['neg', OpCode.Neg],
-	['store', OpCode.Store],
-	['load', OpCode.Load],
-	['print', OpCode.Print],
-]);
+export type Label = {
+	index: number;
+};
 
-export function assemble(mat: string): VmOperation[] {
+export class Env {
+	labels: Map<string, Label> = new Map();
+
+	declare(name: string): Label {
+		let variable = this.get(name);
+		// 同名の変数が既にあれば何もせずに終了
+		if (variable != null) return variable;
+		// インデックスを採番
+		const index = this.labels.size;
+		variable = { index };
+		this.labels.set(name, variable);
+		return variable;
+	}
+
+	get(name: string): Label | undefined {
+		const variable = this.labels.get(name);
+		if (variable == null) return;
+		return variable;
+	}
+}
+
+export function assemble(mat: string): Buffer {
 	// parse text asm
 	const tree = parse(mat);
 
 	// generate vm code
-	const code = emitCode(tree);
+	const w = new InstructionWriter;
+	const env = new Env();
+	emitCode(w, env, tree);
+	const code = w.serialize();
 
 	return code;
 }
 
-function emitCode(program: Program): VmOperation[] {
-	const asm: VmOperation[] = [];
-
+function emitCode(w: InstructionWriter, env: Env, program: Program) {
 	for (const node of program.children) {
-		if (node.kind !== 'Operation') {
-			throw new Error('operation expected');
+		if (node.kind !== 'Statement') {
+			throw new Error('statement expected');
 		}
 
-		const opCode = opCodeTable.get(node.opcode.toLowerCase());
-		if (opCode == null) {
-			throw new Error('unknown operation');
+		const op = opTable.find(x => x.name.toLowerCase() === node.opcode.toLowerCase());
+		if (op == null) {
+			throw new Error('unknown instruction');
 		}
 
-		const operands: (string | number)[] = [];
+		const operands: number[] = [];
 		for (const child of node.children) {
 			switch (child.kind) {
 				case 'NumberLiteral': {
@@ -48,7 +59,8 @@ function emitCode(program: Program): VmOperation[] {
 					break;
 				}
 				case 'Reference': {
-					operands.push(child.idetifier);
+					const label = env.declare(child.idetifier);
+					operands.push(label.index);
 					break;
 				}
 				default: {
@@ -57,8 +69,6 @@ function emitCode(program: Program): VmOperation[] {
 			}
 		}
 
-		asm.push(new VmOperation(opCode, operands));
+		w.write(new Instruction(op.code, operands));
 	}
-
-	return asm;
 }

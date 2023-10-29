@@ -10,7 +10,7 @@ async function start() {
 	const code = assemble(source);
 
 	// run the vm code
-	runCode(code);
+	runCode(code, false);
 }
 
 start()

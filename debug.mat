@@ -1,8 +1,8 @@
 push 1
-pushIdent a
+pushLocal a
 store
 
-pushIdent a
+pushLocal a
 load
 push 3
 add

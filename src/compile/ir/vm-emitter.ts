@@ -1,24 +1,24 @@
-import { VmOperation, OpCode } from '../../vm/operation.js';
-import { VmWriter } from '../../vm/index.js';
+import { Instruction, OpCode, InstructionWriter } from '../../vm/instruction.js';
+import { Env } from './index.js';
 import { IrNode } from './node.js';
 
-export function emitCode(w: VmWriter, node: IrNode) {
-	emitProgram(w, node);
+export function emitCode(w: InstructionWriter, env: Env, node: IrNode) {
+	emitProgram(w, env, node);
 }
 
-function emitProgram(w: VmWriter, node: IrNode) {
+function emitProgram(w: InstructionWriter, env: Env, node: IrNode) {
 	if (node.kind === 'Program') {
-		node.children.forEach(x => emitStatement(w, x));
+		node.children.forEach(x => emitStatement(w, env, x));
 		return;
 	}
 	throw new Error('unhandled node:' + node.kind);
 }
 
-function emitStatement(w: VmWriter, node: IrNode) {
+function emitStatement(w: InstructionWriter, env: Env, node: IrNode) {
 	switch (node.kind) {
 		case 'PrintStatement': {
-			emitExpression(w, node.children[0]);
-			w.write(new VmOperation(OpCode.Print));
+			emitExpression(w, env, node.children[0]);
+			w.write(new Instruction(OpCode.Print));
 			return;
 		}
 		case 'AssignStatement': {
@@ -27,9 +27,10 @@ function emitStatement(w: VmWriter, node: IrNode) {
 			if (a.kind !== 'Reference') {
 				throw new Error('reference expected');
 			}
-			emitExpression(w, b);
-			w.write(new VmOperation(OpCode.PushIdent, [a.identifier]));
-			w.write(new VmOperation(OpCode.Store));
+			emitExpression(w, env, b);
+			const local = env.declare(a.identifier);
+			w.write(new Instruction(OpCode.PushLocal, [local.index]));
+			w.write(new Instruction(OpCode.Store));
 			return;
 		}
 		case 'ExpressionStatement': {
@@ -39,50 +40,54 @@ function emitStatement(w: VmWriter, node: IrNode) {
 	throw new Error('unhandled node:' + node.kind);
 }
 
-function emitExpression(w: VmWriter, node: IrNode) {
+function emitExpression(w: InstructionWriter, env: Env, node: IrNode) {
 	switch (node.kind) {
 		case 'Add': {
-			emitExpression(w, node.children[1]);
-			emitExpression(w, node.children[0]);
-			w.write(new VmOperation(OpCode.Add));
+			emitExpression(w, env, node.children[1]);
+			emitExpression(w, env, node.children[0]);
+			w.write(new Instruction(OpCode.Add));
 			return;
 		}
 		case 'Sub': {
-			emitExpression(w, node.children[1]);
-			emitExpression(w, node.children[0]);
-			w.write(new VmOperation(OpCode.Sub));
+			emitExpression(w, env, node.children[1]);
+			emitExpression(w, env, node.children[0]);
+			w.write(new Instruction(OpCode.Sub));
 			return;
 		}
 		case 'Mul': {
-			emitExpression(w, node.children[1]);
-			emitExpression(w, node.children[0]);
-			w.write(new VmOperation(OpCode.Mul));
+			emitExpression(w, env, node.children[1]);
+			emitExpression(w, env, node.children[0]);
+			w.write(new Instruction(OpCode.Mul));
 			return;
 		}
 		case 'Div': {
-			emitExpression(w, node.children[1]);
-			emitExpression(w, node.children[0]);
-			w.write(new VmOperation(OpCode.Div));
+			emitExpression(w, env, node.children[1]);
+			emitExpression(w, env, node.children[0]);
+			w.write(new Instruction(OpCode.Div));
 			return;
 		}
 		case 'Rem': {
-			emitExpression(w, node.children[1]);
-			emitExpression(w, node.children[0]);
-			w.write(new VmOperation(OpCode.Rem));
+			emitExpression(w, env, node.children[1]);
+			emitExpression(w, env, node.children[0]);
+			w.write(new Instruction(OpCode.Rem));
 			return;
 		}
 		case 'Neg': {
-			emitExpression(w, node.children[0]);
-			w.write(new VmOperation(OpCode.Neg));
+			emitExpression(w, env, node.children[0]);
+			w.write(new Instruction(OpCode.Neg));
 			return;
 		}
 		case 'NumberLiteral': {
-			w.write(new VmOperation(OpCode.Push, [node.value]));
+			w.write(new Instruction(OpCode.Push, [node.value]));
 			return;
 		}
 		case 'Reference': {
-			w.write(new VmOperation(OpCode.PushIdent, [node.identifier]));
-			w.write(new VmOperation(OpCode.Load));
+			const local = env.get(node.identifier);
+			if (local == null) {
+				throw new Error('variable not found');
+			}
+			w.write(new Instruction(OpCode.PushLocal, [local.index]));
+			w.write(new Instruction(OpCode.Load));
 			return;
 		}
 	}
