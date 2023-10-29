@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import { assemble } from './assemble/index.js';
 
-async function start() {
+async function entry() {
 	const filePath = './debug.asm';
 	const asm = await fs.readFile(filePath, { encoding: 'utf-8' });
 
@@ -13,7 +13,7 @@ async function start() {
 	await fs.writeFile(output, code);
 }
 
-start()
+entry()
 .catch(err => {
 	console.log(err);
 });

@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import { disasm } from './assemble/disasm';
 
-async function start() {
+async function entry() {
 	const input = './debug.mbc';
 	const code = await fs.readFile(input);
 
@@ -13,7 +13,7 @@ async function start() {
 	await fs.writeFile(output, asm, { encoding: 'utf-8' });
 }
 
-start()
+entry()
 .catch(err => {
 	console.log(err);
 });

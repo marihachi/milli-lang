@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import { runCode } from './vm/index.js';
 
-async function start() {
+async function entry() {
 	const filePath = './debug.mbc';
 	const code = await fs.readFile(filePath);
 
@@ -9,7 +9,7 @@ async function start() {
 	runCode(code, false);
 }
 
-start()
+entry()
 .catch(err => {
 	console.log(err);
 });

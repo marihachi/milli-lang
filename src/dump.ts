@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { compile } from './compile/index.js';
 import { disasm } from './assemble/disasm.js';
 
-async function start() {
+async function entry() {
 	const filePath = './debug.mil';
 	const source = await fs.readFile(filePath, { encoding: 'utf-8' });
 
@@ -19,7 +19,7 @@ async function start() {
 	await fs.writeFile('./debug.asm', asm, { encoding: 'utf-8' });
 }
 
-start()
+entry()
 .catch(err => {
 	console.log(err);
 });
