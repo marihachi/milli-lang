@@ -6,8 +6,9 @@
   "main": "./dist/start.js",
   "scripts": {
     "build": "tsc",
+    "compile": "node ./dist/compile.js",
     "start": "node ./dist/start.js",
-    "start-mat": "node ./dist/start-mat.js",
+    "asm": "node ./dist/asm.js",
     "disasm": "node ./dist/disasm.js"
   },
   "author": "marihachi",

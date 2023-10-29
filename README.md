@@ -2,26 +2,40 @@
 A toy language made with TypeScript.  
 We execute a code by compiling it for the VM.
 
-## Usage
+## Installation
 Linux or Windows(WSL) supported.
 
-Run a milli code:
 ```
 $ npm i
 $ npm run build
-$ npm run mil
 ```
-Script file: `debug.mil`
 
-Run an assembly text:
-```
-$ npm run mat
-```
-Source file: `debug.mat`
+## Usage
 
-Compile a milli code to assembly text:
+source file: `*.mil`
+bytecode file: `*.mbc`
+assembly file: `*.asm`
+
+Compile a milli-lang source(.mil) to a bytecode file(.mbc):
 ```
-$ npm run mil2mat
+$ npm run compile
+```
+
+Run a bytecode file(.mbc):
+```
+$ npm run start
+```
+
+### Assemble
+
+Assemble an assembly text(.asm) to a bytecode file(.mbc):
+```
+$ npm run asm
+```
+
+Disassemble a bytecode file(.mbc) to an assembly text(.asm):
+```
+$ npm run disasm
 ```
 
 ## License

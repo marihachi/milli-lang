@@ -1,20 +1,16 @@
 import { promises as fs } from 'fs';
-import { compile } from './compile/index.js';
 import { InstructionReader, opTable } from './vm/instruction.js';
 
 async function start() {
-	const input = './debug.mil';
-	const source = await fs.readFile(input, { encoding: 'utf-8' });
+	const input = './debug.mbc';
+	const code = await fs.readFile(input);
 
-	// milli code -> vm code
-	const asm = compile(source, false);
-
-	// vm code -> asm text
-	const mat = disasm(asm);
+	// bytecode -> asm text
+	const asm = disasm(code);
 
 	// write the asm text
-	const output = './disasm.mat';
-	await fs.writeFile(output, mat, { encoding: 'utf-8' });
+	const output = './debug.asm';
+	await fs.writeFile(output, asm, { encoding: 'utf-8' });
 }
 
 function disasm(instructions: Buffer): string {

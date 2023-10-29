@@ -7,4 +7,5 @@
 # user
 /dist
 /temp
-disasm.mat
+debug.mbc
+debug.asm
