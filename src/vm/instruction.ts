@@ -3,30 +3,38 @@
 	0x00 Nop
 	0x01 PushLocal
 	0x02 Push
-	0x10 Add
-	0x11 Sub
-	0x12 Mul
-	0x13 Div
-	0x14 Rem
-	0x15 Neg
-	0x20 Store
-	0x21 Load
-	0x30 Print
+	0x08 Store
+	0x09 Load
+	0x20 Add
+	0x21 Sub
+	0x22 Mul
+	0x23 Div
+	0x24 Rem
+	0x25 Neg
+	0x40 DefineFn
+	0x48 Call
+	0x60 Syscall
 */
 
 export enum OpCode {
 	Nop = 0x00,
 	PushLocal,
 	Push,
-	Add = 0x10,
+	Store = 0x08,
+	Load,
+	Add = 0x20,
 	Sub,
 	Mul,
 	Div,
 	Rem,
 	Neg,
-	Store = 0x20,
-	Load,
-	Print = 0x30,
+	DefineFn = 0x40,
+	Call = 0x48,
+	Syscall = 0x60,
+}
+
+export enum SyscallKind {
+	Print = 0x00,
 }
 
 export const opTable: { code: OpCode, name: string, operands: number }[] = [
@@ -41,7 +49,7 @@ export const opTable: { code: OpCode, name: string, operands: number }[] = [
 	{ code: OpCode.Neg, name: 'Neg', operands: 0 },
 	{ code: OpCode.Store, name: 'Store', operands: 0 },
 	{ code: OpCode.Load, name: 'Load', operands: 0 },
-	{ code: OpCode.Print, name: 'Print', operands: 0 },
+	{ code: OpCode.Syscall, name: 'Syscall', operands: 1 },
 ];
 
 /*

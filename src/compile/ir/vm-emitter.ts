@@ -1,4 +1,4 @@
-import { Instruction, OpCode, InstructionWriter } from '../../vm/instruction.js';
+import { Instruction, OpCode, InstructionWriter, SyscallKind } from '../../vm/instruction.js';
 import { Env } from './index.js';
 import { IrNode } from './node.js';
 
@@ -18,7 +18,7 @@ function emitStatement(w: InstructionWriter, env: Env, node: IrNode) {
 	switch (node.kind) {
 		case 'PrintStatement': {
 			emitExpression(w, env, node.children[0]);
-			w.write(new Instruction(OpCode.Print));
+			w.write(new Instruction(OpCode.Syscall, [SyscallKind.Print]));
 			return;
 		}
 		case 'AssignStatement': {

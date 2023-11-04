@@ -1,7 +1,9 @@
 import { Buffer } from 'buffer';
-import { OpCode, InstructionReader } from './instruction.js';
+import { OpCode, InstructionReader, SyscallKind } from './instruction.js';
 
 // 32bit instruction
+
+type Inst = { opCode: number, operands: number[] };
 
 export function runCode(buf: Buffer, debug: boolean) {
 	const memory: number[] = [];
@@ -122,14 +124,30 @@ export function runCode(buf: Buffer, debug: boolean) {
 				stack.push(x);
 				break;
 			}
-			case OpCode.Print: {
-				const a = stack.pop();
-				if (typeof a !== 'number') {
-					throw new Error('runtime error. (op: Print)');
-				}
-				console.log(a);
+			case OpCode.Syscall: {
+				syscall(inst, stack, memory);
 				break;
 			}
+			default: {
+				throw new Error('runtime error. invalid op code');
+			}
+		}
+	}
+}
+
+function syscall(inst: Inst, stack: number[], memory: number[]) {
+	const kind = inst.operands[0];
+	switch (kind) {
+		case SyscallKind.Print: {
+			const a = stack.pop();
+			if (typeof a !== 'number') {
+				throw new Error('runtime error. (op: Syscall)');
+			}
+			console.log(a);
+			break;
+		}
+		default: {
+			throw new Error('runtime error. (op: Syscall)');
 		}
 	}
 }
