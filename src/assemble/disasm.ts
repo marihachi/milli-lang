@@ -1,11 +1,10 @@
-import { InstructionReader, opTable } from '../vm/instruction.js';
+import { opTable, readInstruction } from '../vm/instruction.js';
 
 export function disasm(instructions: Buffer): string {
 	let mat = '';
-	const reader = new InstructionReader(instructions);
 	let address = 0;
 	while (true) {
-		const inst = reader.read(address);
+		const inst = readInstruction(instructions, address);
 		address += 4;
 		if (inst == null) {
 			break;

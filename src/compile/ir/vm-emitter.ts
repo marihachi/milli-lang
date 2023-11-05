@@ -1,4 +1,5 @@
-import { Instruction, OpCode, InstructionWriter, SyscallKind } from '../../vm/instruction.js';
+import { Instruction, OpCode, InstructionWriter } from '../../vm/instruction.js';
+import { SyscallKind } from '../../vm/syscall.js';
 import { Env } from './index.js';
 import { IrNode } from './node.js';
 

@@ -1,4 +1,4 @@
-import { InstructionWriter, Instruction, opTable } from '../vm/instruction.js';
+import { Instruction, InstructionWriter, opTable } from '../vm/instruction.js';
 import { parse } from './parser.js';
 import { Program } from './node.js';
 
@@ -32,7 +32,7 @@ export function assemble(mat: string): Buffer {
 	const tree = parse(mat);
 
 	// generate vm code
-	const w = new InstructionWriter;
+	const w = new InstructionWriter();
 	const env = new Env();
 	emitCode(w, env, tree);
 	const code = w.serialize();

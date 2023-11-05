@@ -1,17 +1,40 @@
-import { Buffer } from 'buffer';
-import { OpCode, InstructionReader, SyscallKind } from './instruction.js';
+import { OpCode, readInstruction } from './instruction.js';
+import { Module } from './module.js';
+import { syscall } from './syscall.js';
 
 // 32bit instruction
 
-type Inst = { opCode: number, operands: number[] };
+export class Session {
+	constructor(
+		public memory: number[],
+		public modules: Module[],
+		public frame?: Frame,
+	) { }
+}
 
-export function runCode(buf: Buffer, debug: boolean) {
-	const memory: number[] = [];
-	const stack: number[] = [];
-	let pc = 0;
-	const reader = new InstructionReader(buf);
+class Frame {
+	constructor(
+		public moduleIndex: number,
+		public funcIndex: number,
+		public pc: number,
+		public stack: number[],
+		public parent?: Frame,
+	) { }
+}
+
+export function run(sess: Session, debug: boolean) {
+	sess.frame = new Frame(0, 0, 0, []);
+
 	while (true) {
-		const inst = reader.read(pc);
+		const frame: Frame = sess.frame;
+		const stack = frame.stack;
+		const memory = sess.memory;
+
+		const inst = readInstruction(
+			sess.modules[frame.moduleIndex].funcs[frame.funcIndex].instructions,
+			frame.pc
+		);
+
 		if (inst == null) {
 			if (debug) {
 				console.log('stop');
@@ -20,14 +43,14 @@ export function runCode(buf: Buffer, debug: boolean) {
 		}
 
 		if (debug) {
-			console.log('pc:', pc);
+			console.log('pc:', frame.pc);
 			console.log('inst:', inst.opCode + ', ' + inst.operands.join(', '));
 			console.log('stack:', stack);
 			console.log('memory:', memory);
 			console.log('----');
 		}
 
-		pc += 4;
+		frame.pc += 4;
 
 		switch (inst.opCode) {
 			case OpCode.Nop: {
@@ -39,6 +62,30 @@ export function runCode(buf: Buffer, debug: boolean) {
 			}
 			case OpCode.PushLocal: {
 				stack.push(inst.operands[0]);
+				break;
+			}
+			case OpCode.Store: {
+				const a = stack.pop();
+				if (typeof a !== 'number') {
+					throw new Error('runtime error. (op: Store)');
+				}
+				const b = stack.pop();
+				if (typeof b !== 'number') {
+					throw new Error('runtime error. (op: Store)');
+				}
+				memory[a] = b;
+				break;
+			}
+			case OpCode.Load: {
+				const a = stack.pop();
+				if (typeof a !== 'number') {
+					throw new Error('runtime error. (op: Load)');
+				}
+				const x = memory[a];
+				if (typeof x !== 'number') {
+					throw new Error('runtime error. (op: Load)');
+				}
+				stack.push(x);
 				break;
 			}
 			case OpCode.Add: {
@@ -100,28 +147,37 @@ export function runCode(buf: Buffer, debug: boolean) {
 				stack.push(x);
 				break;
 			}
-			case OpCode.Store: {
-				const a = stack.pop();
-				if (typeof a !== 'number') {
-					throw new Error('runtime error. (op: Store)');
+			case OpCode.Call: {
+				let length = inst.operands[0];
+				const fIndex = inst.operands[1];
+				const mIndex = inst.operands[2];
+				const subStack: number[] = [];
+				for (let i = 0; i < length; i++) {
+					if (stack.length == 0) {
+						throw new Error('runtime error. (op: Call)');
+					}
+					const a = stack.pop();
+					if (typeof a !== 'number') {
+						throw new Error('runtime error. (op: Call)');
+					}
+					subStack.push(a);
 				}
-				const b = stack.pop();
-				if (typeof b !== 'number') {
-					throw new Error('runtime error. (op: Store)');
-				}
-				memory[a] = b;
+				sess.frame = new Frame(mIndex, fIndex, 0, subStack, frame);
 				break;
 			}
-			case OpCode.Load: {
-				const a = stack.pop();
-				if (typeof a !== 'number') {
-					throw new Error('runtime error. (op: Load)');
+			case OpCode.Ret: {
+				if (sess.frame.parent == null) {
+					throw new Error('runtime error. (op: Ret)');
 				}
-				const x = memory[a];
-				if (typeof x !== 'number') {
-					throw new Error('runtime error. (op: Load)');
+				const parentFrame: Frame = sess.frame.parent;
+				if (inst.operands[0] != 0) {
+					const a = stack.pop();
+					if (typeof a !== 'number') {
+						throw new Error('runtime error. (op: Ret)');
+					}
+					parentFrame.stack.push(a);
 				}
-				stack.push(x);
+				sess.frame = parentFrame;
 				break;
 			}
 			case OpCode.Syscall: {
@@ -131,23 +187,6 @@ export function runCode(buf: Buffer, debug: boolean) {
 			default: {
 				throw new Error('runtime error. invalid op code');
 			}
-		}
-	}
-}
-
-function syscall(inst: Inst, stack: number[], memory: number[]) {
-	const kind = inst.operands[0];
-	switch (kind) {
-		case SyscallKind.Print: {
-			const a = stack.pop();
-			if (typeof a !== 'number') {
-				throw new Error('runtime error. (op: Syscall)');
-			}
-			console.log(a);
-			break;
-		}
-		default: {
-			throw new Error('runtime error. (op: Syscall)');
 		}
 	}
 }

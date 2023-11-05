@@ -1,3 +1,10 @@
+export class Instruction {
+	constructor(
+		public opCode: number,
+		public operands: number[] = [],
+	) { }
+}
+
 /*
 	[Instructions]
 	0x00 Nop
@@ -11,8 +18,7 @@
 	0x23 Div
 	0x24 Rem
 	0x25 Neg
-	0x40 DefineFn
-	0x48 Call
+	0x40 Call
 	0x60 Syscall
 */
 
@@ -28,13 +34,9 @@ export enum OpCode {
 	Div,
 	Rem,
 	Neg,
-	DefineFn = 0x40,
-	Call = 0x48,
+	Call = 0x40,
+	Ret = 0x48,
 	Syscall = 0x60,
-}
-
-export enum SyscallKind {
-	Print = 0x00,
 }
 
 export const opTable: { code: OpCode, name: string, operands: number }[] = [
@@ -62,13 +64,6 @@ export const opTable: { code: OpCode, name: string, operands: number }[] = [
  * - value: number
 */
 
-export class Instruction {
-	constructor(
-		public opcode: OpCode,
-		public operands: number[] = [],
-	) { }
-}
-
 export class InstructionWriter {
 	instructions: Instruction[] = [];
 
@@ -79,7 +74,7 @@ export class InstructionWriter {
 	serialize(): Buffer {
 		const bytes: number[] = [];
 		for (const inst of this.instructions) {
-			bytes.push(inst.opcode);
+			bytes.push(inst.opCode);
 			for (let i = 0; i < 3; i++) {
 				if (i < inst.operands.length) {
 					bytes.push(inst.operands[i]);
@@ -93,40 +88,31 @@ export class InstructionWriter {
 	}
 }
 
-export class InstructionReader {
-	constructor(
-		public buf: Buffer,
-	) { }
-
-	/**
-	 * @param address byte offset
-	*/
-	read(address: number): { opCode: number, operands: number[] } | undefined {
-		// fetch
-		let inst;
-		try {
-			inst = this.buf.readUInt32LE(address);
-		} catch (e) {
-			return;
-		}
-
-		// parse
-		// bit[7:0]   opCode    (8 bits)
-		// bit[15:8]  operand 0 (8 bits)
-		// bit[23:16] operand 1 (8 bits)
-		// bit[31:24] operand 2 (8 bits)
-		const opCode = inst & 0xFF;
-		const operands = [];
-		for (let i = 0; i < 3; i++) {
-			// 8, 16, 24
-			const offset = (i + 1) * 8;
-			const operand = (inst >> offset) & 0xFF;
-			operands.push(operand);
-		}
-
-		return {
-			opCode,
-			operands,
-		};
+/**
+ * @param address byte offset
+*/
+export function readInstruction(buf: Buffer, address: number): Instruction | undefined {
+	// fetch
+	let inst;
+	try {
+		inst = buf.readUInt32LE(address);
+	} catch (e) {
+		return;
 	}
+
+	// parse
+	// bit[7:0]   opCode    (8 bits)
+	// bit[15:8]  operand 0 (8 bits)
+	// bit[23:16] operand 1 (8 bits)
+	// bit[31:24] operand 2 (8 bits)
+	const opCode = inst & 0xFF;
+	const operands = [];
+	for (let i = 0; i < 3; i++) {
+		// 8, 16, 24
+		const offset = (i + 1) * 8;
+		const operand = (inst >> offset) & 0xFF;
+		operands.push(operand);
+	}
+
+	return new Instruction(opCode, operands);
 }
